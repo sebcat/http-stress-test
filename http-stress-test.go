@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"sync"
@@ -18,12 +19,15 @@ type testReq struct {
 	body     string
 }
 
-type reqstat int
-
 const (
 	STATUS_SUCCESS = iota
 	STATUS_FAILED
 )
+
+type reqstat struct {
+	status int
+	time   time.Duration
+}
 
 type senderstat struct {
 	nsucceded int
@@ -42,12 +46,21 @@ func sendHttpRequest(cli *http.Client, req *testReq, statusChan chan reqstat) {
 	}
 
 	httpReq.Header.Set("User-Agent", "HTTPStressTester/1.0")
+	status := reqstat{status: STATUS_FAILED}
+	startTime := time.Now()
 	resp, err := cli.Do(httpReq)
-	if err == nil && resp.StatusCode == 200 {
-		statusChan <- STATUS_SUCCESS
+	if err == nil {
+		ioutil.ReadAll(resp.Body) // read entire body
+		resp.Body.Close()
+		status.time = time.Since(startTime)
+		if resp.StatusCode == 200 {
+			status.status = STATUS_SUCCESS
+		}
 	} else {
-		statusChan <- STATUS_FAILED
+		status.time = time.Since(startTime)
 	}
+
+	statusChan <- status
 }
 
 func startHttpSender(req *testReq, sendRate, duration int) *senderstat {
@@ -58,14 +71,15 @@ func startHttpSender(req *testReq, sendRate, duration int) *senderstat {
 	doneSendChan := time.After(time.Duration(duration) * time.Second)
 	var sstat senderstat
 	waitGroup := &sync.WaitGroup{}
-	startTime := time.Now()
 	go func() {
-		for rstat := range httpStatusChan {
-			if rstat == STATUS_SUCCESS {
+		for reqstat := range httpStatusChan {
+			if reqstat.status == STATUS_SUCCESS {
 				sstat.nsucceded += 1
 			} else {
 				sstat.nfailed += 1
 			}
+
+			sstat.time += reqstat.time
 			waitGroup.Done()
 		}
 	}()
@@ -79,7 +93,6 @@ func startHttpSender(req *testReq, sendRate, duration int) *senderstat {
 			ticker.Stop()
 			waitGroup.Wait()
 			close(httpStatusChan)
-			sstat.time = time.Since(startTime)
 			return &sstat
 		}
 	}
