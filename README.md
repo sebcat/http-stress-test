@@ -21,10 +21,6 @@ based on response time measurements.
 We will explore that assumption in the environment of web application
 scanning tools used over the Internet.
 
-Difference between requests to different resources is expected. foo.php might 
-execute more code and perform more DB interaction server side that bar.php.
-Here, we assume that we're already 
-
 ## Sender model for weblat.go
 
 We're using Go's net/http DefaultClient as a reference client with
@@ -41,6 +37,10 @@ be suspended for five seconds until the next round will begin, this time with
 one more concurrent process.  The number of requests sent by each 
 concurrent process is given by the constant NREQS. All HTTP requests are 
 directed against one resource, DSTURL. 
+
+Difference in average response times between requests to different resources 
+is expected. foo.php might execute more code and perform more DB interaction 
+server side that bar.php. Therefor, we limit our tests to one resource. 
 
 The tests are performed over a wired network.
 
