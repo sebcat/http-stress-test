@@ -52,8 +52,9 @@ This is a common concurrency model for threaded applications running on e.g.,
 
 ## weblat.go measurements
 
-- High NCONCURRENTMAX with low NREQS (bursts) against static content 
-- High NCONCURRENTMAX with high NREQS (sustained traffic) against static 
+- Low to high NCONCURRENTMAX with low NREQS (bursts) against static content 
+- Low to high NCONCURRENTMAX with high NREQS (sustained traffic) against static 
   content
-- High NCONCURRENTMAX with low NREQS (bursts) against dynamic content 
-- High NCONCURRENTMAX with high NREQS (sustained traffic) against dynamic 
+- Low to high NCONCURRENTMAX with low NREQS (bursts) against dynamic content 
+- Low to high NCONCURRENTMAX with high NREQS (sustained traffic) against 
+  dynamic content
