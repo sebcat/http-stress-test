@@ -42,7 +42,8 @@ Difference in average response times between requests to different resources
 is expected. foo.php might execute more code and perform more DB interaction 
 server side that bar.php. Therefor, we limit our tests to one resource. 
 
-The tests are performed over a wired network.
+The tests are performed over the Internet, no WiFi, against a server with
+no other significant traffic than the test traffic itself. 
 
 The IO model is blocking, non-multiplexing within the concurrent processes.
 This is a common concurrency model for threaded applications running on e.g.,
