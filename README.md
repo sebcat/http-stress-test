@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ## Problem
 
 black box testing against live systems can cause high load on the
@@ -57,8 +56,3 @@ This is a common concurrency model for threaded applications running on e.g.,
   content
 - High NCONCURRENTMAX with low NREQS (bursts) against dynamic content 
 - High NCONCURRENTMAX with high NREQS (sustained traffic) against dynamic 
-  content
-=======
-weblat
-======
->>>>>>> 4682643f96d7d12f81636f041defdd0378a398e7
