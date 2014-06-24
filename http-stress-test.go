@@ -63,7 +63,7 @@ func sendHttpRequest(cli *http.Client, req *testReq, statusChan chan reqstat) {
 	statusChan <- status
 }
 
-func startHttpSender(req *testReq, sendRate, duration int) *senderstat {
+func sendHttpRequests(req *testReq, sendRate, duration int) *senderstat {
 
 	client := &http.Client{}
 	ticker := time.NewTicker(time.Second / time.Duration(sendRate))
@@ -123,7 +123,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("%v\n", err)
 	} else {
-		res := startHttpSender(&req, *sendRate, *duration)
+		res := sendHttpRequests(&req, *sendRate, *duration)
 		tot := res.nsucceded + res.nfailed
 		avg := res.time / time.Duration(tot)
 		fmt.Printf("total %v (%v failed) time: %v avg: %v\n", tot, res.nfailed,
