@@ -63,9 +63,10 @@ func sendHttpRequest(cli *http.Client, req *testReq, statusChan chan reqstat) {
 	statusChan <- status
 }
 
-func sendHttpRequests(req *testReq, sendRate, duration int) *senderstat {
+func sendHttpRequests(req *testReq, sendRate, duration, timeout int) *senderstat {
 
-	client := &http.Client{}
+	toDuration := time.Duration(timeout) * time.Second
+	client := &http.Client{Timeout: toDuration}
 	ticker := time.NewTicker(time.Second / time.Duration(sendRate))
 	httpStatusChan := make(chan reqstat)
 	doneSendChan := time.After(time.Duration(duration) * time.Second)
@@ -98,7 +99,7 @@ func sendHttpRequests(req *testReq, sendRate, duration int) *senderstat {
 	}
 }
 
-func validateSettings(req *testReq, sendRate, duration int) error {
+func validateSettings(req *testReq, sendRate, duration, timeout int) error {
 	if len(req.url) == 0 {
 		return errors.New("URL not specified")
 	}
@@ -110,6 +111,7 @@ func main() {
 	var req testReq
 	sendRate := flag.Int("rate", 50, "send rate (req/s)")
 	duration := flag.Int("duration", 3, "send duration (s)")
+	timeout := flag.Int("timeout", 20, "request timeout (s)")
 	flag.StringVar(&req.method, "method", "GET", "HTTP method")
 	flag.StringVar(&req.url, "url", "", "URL")
 	flag.StringVar(&req.body, "body", "", "request body")
@@ -118,12 +120,11 @@ func main() {
 	flag.Parse()
 
 	req.method = strings.ToUpper(req.method)
-
-	err := validateSettings(&req, *sendRate, *duration)
+	err := validateSettings(&req, *sendRate, *duration, *timeout)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 	} else {
-		res := sendHttpRequests(&req, *sendRate, *duration)
+		res := sendHttpRequests(&req, *sendRate, *duration, *timeout)
 		tot := res.nsucceded + res.nfailed
 		avg := res.time / time.Duration(tot)
 		fmt.Printf("total %v (%v failed) time: %v avg: %v\n", tot, res.nfailed,
