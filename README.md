@@ -32,6 +32,7 @@ Usage of http-stress-test:
   -duration=3: send duration (s)
   -method="GET": HTTP method
   -rate=50: send rate (req/s)
+  -timeout=20: request timeout (s)
   -url="": URL
 ```
 
