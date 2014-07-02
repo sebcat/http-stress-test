@@ -88,8 +88,8 @@ func sendHttpRequests(req *testReq, sendRate, duration, timeout int) *senderstat
 	for {
 		select {
 		case <-ticker.C:
-			go sendHttpRequest(client, req, httpStatusChan)
 			waitGroup.Add(1)
+			go sendHttpRequest(client, req, httpStatusChan)
 		case <-doneSendChan:
 			ticker.Stop()
 			waitGroup.Wait()
